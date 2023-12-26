@@ -20,6 +20,7 @@ host_list = []
 test_host = Host("141.147.86.138")
 test_host.set_user("ro")
 test_host.set_port("22")
+test_host.set_alias("mushroomytest")
 host_list.append(test_host)
 print("Copying public keys to each host in the host list...")
 for host in host_list:
@@ -35,3 +36,15 @@ for host in host_list:
 # in order to input passwords automatically, sshpass is required - optional dependency
 # TODO Append aliases to the ssh config
 print("Appending new server configs to ssh config...")
+with open(ssh_path, "a") as ssh_config:
+    for host in host_list:
+        print(
+            f"Appending SSH alias {host.alias} for {host.hostname} to local SSH config..."
+        )
+        ssh_config.write(
+            f"""Host {host.alias}
+    Hostname {host.hostname}
+    Port {host.port}
+    User {host.user}
+    Identityfile {pem_path}"""
+        )
