@@ -1,29 +1,37 @@
 #!/usr/bin/python
-import subprocess
-import shlex
 from host import Host
 
 
 print("Welcome to Ro's SSH Config Helper!")
-print("Checking configuration file for environment variables...")
+# print("Checking configuration file for environment variables...")
 # TODO: read configuration file
 
-# Following is temp code which should eventually be moved to the config file?
-pem_path = "/home/ro/.ssh/roarch.pem"
-ssh_path = "/home/ro/.ssh/config"
+Host.path_to_pem = "/home/ro/.ssh/roarch.pem"
+Host.path_to_config = "/home/ro/.sh/config"
+Host.path_to_pub = "/home/ro/.ssh/roarch.pem.pub"
 
 print("Initialising list of hosts...")
-# TODO: Initialise list of host objects from the class file.
+# TODO: Initialise list of host objects from the csv file.
+test_host = Host("testdel", "0.0.0.0")  # test host
+print(test_host.path_to_pub)
 host_list = []
-
-# test host list for debugging
-test_host = Host("141.147.86.138")
-test_host.set_user("ro")
-test_host.set_port("22")
-test_host.set_alias("mushroomytest")
 host_list.append(test_host)
+print(f"Opening SSH config file located at {Host.path_to_config}")
+try:
+    with open(Host.path_to_config, "a") as ssh_config:
+        for host in host_list:
+            print(
+                f"Appending {host.hostname}:{host.port} to SSH config with the alias {host.alias}"
+            )
+            host.add_alias_to_ssh_config(ssh_config)
+            host.copy_publickey_to_server()
+
+except FileNotFoundError:
+    print(
+        "ERROR: Unable to access the ssh config file. Perhaps you do not have permissions or the parent directories do not exist?"
+    )
+# test host list for debugging
 print("Copying public keys to each host in the host list...")
-for host in host_list:
 # expected output is "{host.user}@{host.hostname}'s password"
 # in order to input passwords automatically, sshpass is required - optional dependency
 # TODO Append aliases to the ssh config
