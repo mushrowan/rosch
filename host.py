@@ -1,41 +1,50 @@
-import subprocess
+#!/usr/bin/python3
 import shlex
-from pathlib import Path
+import subprocess
 
 
 class Host:
-    path_to_pem = ""
-    path_to_pub = ""
-    path_to_config = f"{Path.home()}/.ssh/config"
+    def __init__(self, csv_dictionary: dict, path_to_pem=""):
+        self.dictionary = {"User": "root"}
+        self.dictionary.update({"Identityfile": path_to_pem, "Port": "22"})
+        self.dictionary.update(csv_dictionary)
 
-    def __init__(self, alias, hostname, port="22", user="root"):
-        self.hostname = hostname
-        self.alias = alias
-        self.port = port
-        self.user = user
+    def check_required_keys(self):
+        if "Host" not in self.dictionary or self.dictionary["Host"] == "":
+            raise KeyError(
+                """You have not included a Host (address) for one of your
+                hosts. Please make sure that there is a Host column and that
+                every row is filled."""
+            )
+        if "Hostname" not in self.dictionary or self.dictionary["Hostname"] == "":
+            raise KeyError(
+                """You have not included a Hostname (alias) for one of your 
+                hosts. Please make sure there is a Hostname column and every
+                row is filled."""
+            )
 
-    def add_alias_to_ssh_config(self, ssh_config):
-        print(
-            "Appending new server config to ssh config..."
-        )  # It may be better to do this in the main function because this will continuously open and close the config
-        print(f"Checking if alias {self.alias} exists in {Host.path_to_config}...")
-        print(
-            f"Appending SSH alias {self.alias} for {self.hostname} to local SSH config..."
-        )
-        ssh_config.write(
-            f"""Host {self.alias}
-    Hostname {self.hostname}
-    Port {self.port}
-    User {self.user}
-    Identityfile {Host.path_to_pub}"""
-        )
+    def add_alias_to_ssh_config(self, ssh_config, tab="  "):
+        print("Appending new server config to ssh config...")
+        # TODO: Add checking for if an alias already exists in the ssh config
+        print(f"Checking if alias {self.dictionary["Host"]} exists in SSH config...")
+        if self.dictionary["Host"] in ssh_config.read():
+            raise ValueError(
+                f"""Host {self.dictionary["Host"]} is already present in your
+                SSH config file. Please either choose a different alias for
+                the host you are trying to add or delete/rename the entry in
+                your SSH config."""
+            )
+        ssh_config.write(f"Host {self.dictionary["Host"]}")
+        for key, value in self.dictionary.items():
+            if key != "Host":
+                ssh_config.write(f"{tab}{key} {value}")
 
-    def copy_publickey_to_server(self):
+    def copy_publickey_to_server(self, public_key):
         print(
-            f"Adding SSH public key {Host.path_to_pub} to {self.user}@{self.hostname} on port {self.port}"
+            f"Adding SSH public key {public_key} to {self.dictionary["User"]}@{self.dictionary["Hostname"]} on port {self.dictionary["Port"]}"
         )
 
         args = shlex.split(
-            f"ssh-copy-id -i {Host.path_to_pub} -p {self.port} {self.user}@{self.hostname}"
+            f"ssh-copy-id -i {self.dictionary["Identityfile"]} -p {self.dictionary["Port"]} {self.dictionary["User"]}@{self.dictionary["Hostname"]}"
         )
         subprocess.run(args)

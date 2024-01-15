@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from host import Host
 
 
@@ -6,10 +6,11 @@ print("Welcome to Ro's SSH Config Helper!")
 # print("Checking configuration file for environment variables...")
 # TODO: read configuration file
 
-Host.path_to_pem = "/home/ro/.ssh/roarch.pem"
-Host.path_to_config = "/home/ro/.sh/config"
-Host.path_to_pub = "/home/ro/.ssh/roarch.pem.pub"
-
+path_to_pem = "/home/ro/.ssh/roarch.pem"
+path_to_config = "/home/ro/.sh/config"
+path_to_pub = "/home/ro/.ssh/roarch.pem.pub"
+bro = Host(:
+)
 print("Initialising list of hosts...")
 # TODO: Initialise list of host objects from the csv file.
 test_host = Host("testdel", "0.0.0.0")  # test host

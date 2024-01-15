@@ -1,0 +1,11 @@
+Host,Hostname,Port,User
+Origin-master,116.202.31.0,22,root
+application-env-bots,65.21.147.252,22,root
+docker-build-agents,65.109.171.232,2222,root
+Mercury-Bots-Cluster-1,49.13.26.231,22,root
+Mercury-Bots-Cluster-2,167.235.251.234,22,root
+Mercury-Env,128.140.48.113,22,root
+LaborCI,5.161.88.209,2222,root
+DIS.BotsServer,5.161.121.187,22,root
+DIS.CoreServer,5.161.195.241,2222,root
+Critica-Core,95.217.154.61,2222,root
