@@ -3,7 +3,7 @@ import shlex
 import subprocess
 
 
-class Host:
+class SSHost:
     def __init__(self, csv_dictionary: dict, path_to_pem=""):
         self.dictionary = {"User": "root"}
         self.dictionary.update({"Identityfile": path_to_pem, "Port": "22"})
