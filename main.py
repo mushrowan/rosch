@@ -2,6 +2,7 @@
 from SSHost import SSHost
 from hostcsv import HostCsv
 from pathlib import Path
+from subprocess import CalledProcessError
 
 
 # print("Checking configuration file for environment variables...")
@@ -49,8 +50,13 @@ def main():
             if userhost_dict["User"] == "":
                 userhost_dict["User"] = "root"
             userhost = SSHost(userhost_dict, str(pem_path))
-            userhost.copy_publickey_to_server(str(pub_path))
-            userhost.add_alias_to_ssh_config(config)
+            try:
+                userhost.copy_publickey_to_server(str(pub_path))
+                userhost.add_alias_to_ssh_config(config)
+            except CalledProcessError:
+                print(
+                    "Something went wrong with copying the public key to the server. Skipping..."
+                )
 
         config.write("\n######### Ro's SSH Config Helper End ########\n")
 

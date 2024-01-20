@@ -4,10 +4,10 @@ import subprocess
 
 
 class SSHost:
-    def __init__(self, csv_dictionary: dict, path_to_pem: str):
+    def __init__(self, key_dictionary: dict, path_to_pem: str):
         self.dictionary = {"User": "root"}
         self.dictionary.update({"Identityfile": path_to_pem, "Port": "22"})
-        self.dictionary.update(csv_dictionary)
+        self.dictionary.update(key_dictionary)
 
     def check_required_keys(self):
         print("Checking that host contains required fields...")
@@ -37,10 +37,10 @@ class SSHost:
                 the host you are trying to add or delete/rename the entry in
                 your SSH config."""
             )
-        ssh_config.write(f"Host {self.dictionary['Host']}")
+        ssh_config.write(f"Host {self.dictionary['Host']}\n")
         for key, value in self.dictionary.items():
             if key != "Host":
-                ssh_config.write(f"{tab}{key} {value}")
+                ssh_config.write(f"{tab}{key} {value}\n")
         print(f"Successfully added {self.dictionary['Host']} to SSH config!")
 
     def copy_publickey_to_server(self, public_key):
@@ -51,4 +51,4 @@ class SSHost:
         args = shlex.split(
             f"ssh-copy-id -i {self.dictionary['Identityfile']} -p {self.dictionary['Port']} {self.dictionary['User']}@{self.dictionary['Hostname']}"
         )
-        subprocess.run(args)
+        subprocess.run(args, shell=False, check=True, stdout=subprocess.PIPE).stdout
