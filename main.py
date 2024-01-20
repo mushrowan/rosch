@@ -1,38 +1,58 @@
 #!/usr/bin/python3
-from host import Host
+from SSHost import SSHost
+from hostcsv import HostCsv
+from pathlib import Path
 
 
-print("Welcome to Ro's SSH Config Helper!")
 # print("Checking configuration file for environment variables...")
 # TODO: read configuration file
 
-path_to_pem = "/home/ro/.ssh/roarch.pem"
-path_to_config = "/home/ro/.sh/config"
-path_to_pub = "/home/ro/.ssh/roarch.pem.pub"
-bro = Host(:
-)
-print("Initialising list of hosts...")
-# TODO: Initialise list of host objects from the csv file.
-test_host = Host("testdel", "0.0.0.0")  # test host
-print(test_host.path_to_pub)
-host_list = []
-host_list.append(test_host)
-print(f"Opening SSH config file located at {Host.path_to_config}")
-try:
-    with open(Host.path_to_config, "a") as ssh_config:
-        for host in host_list:
-            print(
-                f"Appending {host.hostname}:{host.port} to SSH config with the alias {host.alias}"
-            )
-            host.add_alias_to_ssh_config(ssh_config)
-            host.copy_publickey_to_server()
+use_csv = False
+pem_path = Path("/home/ro/.ssh/roarch.pem")
+config_path = Path("/home/ro/.ssh/configtest4")
+pub_path = Path("/home/ro/.ssh/roarch.pem.pub")
+csv_dir = Path(".").glob("*.csv")
 
-except FileNotFoundError:
-    print(
-        "ERROR: Unable to access the ssh config file. Perhaps you do not have permissions or the parent directories do not exist?"
-    )
-# test host list for debugging
-print("Copying public keys to each host in the host list...")
-# expected output is "{host.user}@{host.hostname}'s password"
-# in order to input passwords automatically, sshpass is required - optional dependency
-# TODO Append aliases to the ssh config
+
+def main():
+    print("Welcome to Ro's SSH Config Helper!")
+    host_list = []
+    with open(config_path, "a+", encoding="utf-8") as config:
+        config.write("\n######### Ro's SSH Config Helper Start ########\n")
+        if use_csv is True:
+            for csv_path in csv_dir:
+                host_csv = HostCsv(csv_path).write_csv()
+                host_count = 0
+                for dictionary in host_csv:
+                    host_list.append(SSHost(dictionary, str(pem_path)))
+                    host_count += 1
+                print(f"Detected {str(host_count)} in {csv_path}.")
+            for host in host_list:
+                host.check_required_keys()
+                host.copy_publickey_to_server(str(pub_path))
+                try:
+                    host.add_alias_to_ssh_config(config)
+                except ValueError:
+                    print(f"{host.dictionary['Host']} is already in the Config file.")
+                    print("Skipping...")
+        else:
+            print("Reading Host information from user input.")
+            userhost_dict = dict()
+            userhost_dict.update({"Host": input("Input host alias: ")})
+            userhost_dict.update({"Hostname": input("Input Hostname: ")})
+            userhost_dict.update(
+                {"User": input("Input username (leave blank for root)")}
+            )
+            userhost_dict.update({"Port": input("Input port (leave blank for 22): ")})
+            if userhost_dict["Port"] == "":
+                userhost_dict["Port"] = "22"
+            if userhost_dict["User"] == "":
+                userhost_dict["User"] = "root"
+            userhost = SSHost(userhost_dict, str(pem_path))
+            userhost.copy_publickey_to_server(str(pub_path))
+            userhost.add_alias_to_ssh_config(config)
+
+        config.write("\n######### Ro's SSH Config Helper End ########\n")
+
+
+main()
