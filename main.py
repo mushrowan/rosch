@@ -9,9 +9,9 @@ from subprocess import CalledProcessError
 # TODO: read configuration file
 
 use_csv = False
-pem_path = Path("$HOME/.ssh/rotoca.pem")
-config_path = Path("$HOME/.ssh/config")
-pub_path = Path("$HOME/.ssh/rotoca.pem.pub")
+pem_path = Path(Path.home() / ".ssh/rotoca.pem")
+config_path = Path(Path.home() / ".ssh/config")
+pub_path = Path(Path.home() / ".ssh/rotoca.pem.pub")
 csv_dir = Path(".").glob("*.csv")
 
 
