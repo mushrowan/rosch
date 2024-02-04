@@ -12,7 +12,15 @@ use_csv = False
 pem_path = Path("/home/ro/.ssh/rotoca.pem")
 config_path = Path("/home/ro/.ssh/config")
 pub_path = Path("/home/ro/.ssh/rotoca.pem.pub")
-csv_dir = Path(".").glob("*.csv")
+csv_dir = list(Path(".").glob("*.csv"))
+if len(csv_dir) > 0:
+    print(
+        """rosch has detected csv files in the current directory.\n
+If these csv files are formatted in the correct way, they can be used to configure SSH hosts in bulk.
+"""
+    )
+    print("The following csvs were detected:")
+    [print(path) for path in csv_dir]
 
 
 def main():
