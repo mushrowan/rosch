@@ -30,7 +30,7 @@ class SSHost:
         # TODO: Add checking for if an alias already exists in the ssh config
         print(f"Checking if alias {self.dictionary['Host']} exists in SSH config...")
         ssh_config.seek(0)
-        if self.dictionary["Host"] + "\n" in ssh_config.read():
+        if "\n" + self.dictionary["Host"] + "\n" in ssh_config.read():
             raise ValueError(
                 f"""Host {self.dictionary['Host']} is already present in your
                 SSH config file. Please either choose a different alias for

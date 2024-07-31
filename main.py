@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 from SSHost import SSHost
 from hostcsv import HostCsv
 from pathlib import Path
@@ -9,9 +9,9 @@ from subprocess import CalledProcessError
 # TODO: read configuration file
 
 use_csv = False
-pem_path = Path("/home/ro/.ssh/rotoca.pem")
-config_path = Path("/home/ro/.ssh/config")
-pub_path = Path("/home/ro/.ssh/rotoca.pem.pub")
+pem_path = Path("/home/rain/.ssh/rotoca.pem")
+config_path = Path("/home/rain/.ssh/config")
+pub_path = Path("/home/rain/.ssh/rotoca.pem.pub")
 csv_dir = list(Path(".").glob("*.csv"))
 if len(csv_dir) > 0:
     print(
